@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AuthorizationServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -165,6 +166,34 @@ namespace AuthorizationServer.Controllers
             response.Result = await _userManager.DeleteAsync(user);
             response.Succeeded = response.Result.Succeeded;
 
+            return Ok(response);
+        }
+
+        [HttpPut("reset/{id}/{username}")]
+        public async Task<IActionResult> ResetPasswordAsync(string id, string username, [FromBody]ChangePasswordRequest model)
+        {
+            var response = new UserResponse();
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                response.Result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+                response.Succeeded = response.Result.Succeeded;
+            }
+            else
+            {
+                var errors = new List<string>();
+
+                foreach (var modelErrors in ModelState)
+                {
+                    string propertyName = modelErrors.Key;
+                    errors.Add($"Not valid {propertyName}.");
+                }
+                response.Errors = errors;
+
+                return BadRequest(response);
+            }
             return Ok(response);
         }
     }

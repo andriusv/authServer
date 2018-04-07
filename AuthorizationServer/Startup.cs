@@ -57,7 +57,7 @@ namespace AuthorizationServer
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new Info { Title = "AuthServer", Version = "v1" });
             });
         }
 
@@ -87,7 +87,7 @@ namespace AuthorizationServer
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthServer V1");
             });
 
             app.UseMvc(routes =>
