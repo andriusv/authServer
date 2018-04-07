@@ -10,11 +10,7 @@ namespace AuthorizationServer.Models
 {
     public class ApplicationUser : IdentityUser
     {          
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PasswordOld1 { get; set; }
-        public string PasswordOld2 { get; set; }
-        public string PasswordOld3 { get; set; }
-        public string PasswordOld4 { get; set; }
+        //public string FirstName { get; set; }
+        //public string LastName { get; set; }
     }
 }

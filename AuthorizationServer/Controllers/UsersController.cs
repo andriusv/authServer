@@ -23,102 +23,149 @@ namespace AuthorizationServer.Controllers
             _signManager = signManager;
         }
 
-        // GET: api/<controller>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<controller>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         [AllowAnonymous]
-        // POST api/<controller>
-        [HttpPost]
-        public void Post([FromBody]ApplicationUser value)
-        {
-        }
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]RegisterUserRequest model)
         {
-            var response = new RegisterUserResponse();
+            var response = new UserResponse();
 
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Username };
-                var result = await _userManager.CreateAsync(user, model.Password);
 
-                if (result.Succeeded)
+                try
                 {
-                    response.userName = model.Username;
-                    //await _signManager.SignInAsync(user, false);
-                }
-                else
-                {
-                    var errors = new List<string>();
-                    foreach (var error in result.Errors)
+                    response.Result = await _userManager.CreateAsync(user, model.Password);
+                    response.Succeeded = response.Result.Succeeded;
+                    
+                    if(!response.Result.Succeeded)
                     {
-                        ModelState.AddModelError("", error.Description);
-                        errors.Add(error.Description);
+                        var errors = new List<string>();
+                        foreach (var error in response.Result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                            errors.Add(error.Description);
+                        }
+                        response.Errors = errors;
                     }
+                }
+                catch (Exception ex)
+                {
+                    var errors = new List<string>() { ex.Message };
                     response.Errors = errors;
                 }
             }
             else
             {
-                BadRequest();
+                var errors = new List<string>();
+
+                foreach (var modelErrors in ModelState)
+                {
+                    string propertyName = modelErrors.Key;
+                    errors.Add($"Not valid {propertyName}.");
+                }
+                response.Errors = errors;
+
+                return BadRequest(response);
             }
+
             return Ok(response);
         }
-        
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]LoginRequest model)
+
+        #region Login and Logout - not used at the moment
+
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login([FromBody]LoginRequest model)
+        //{
+        //    var response = new LoginResponse();
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        var result = await _signManager.PasswordSignInAsync(model.Username,
+        //           model.Password, model.RememberMe, false);
+
+        //        if (result.Succeeded)
+        //        {
+        //            response.IsSuccess = true;
+        //            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+        //            {
+        //                response.ReturnUrl = model.ReturnUrl;
+        //            }
+
+        //            return Ok(response);                                       
+        //        }
+        //    }
+        //    response.Error = "Invalid login attempt";
+        //    return Ok(response);
+        //}
+
+        //[HttpPost]
+        //public async Task<IActionResult> Logout()
+        //{
+        //    await _signManager.SignOutAsync();
+        //    return Ok();
+        //}
+
+        #endregion
+
+        // PUT api/<controller>/5/test
+        [HttpPut("{id}/{username}")]
+        public async Task<IActionResult> PutAsync(string id, string username, [FromBody]UserCustom model)
         {
-            var response = new LoginResponse();
+            var response = new UserResponse();
 
             if (ModelState.IsValid)
             {
-                var result = await _signManager.PasswordSignInAsync(model.Username,
-                   model.Password, model.RememberMe, false);
+                var user = await _userManager.FindByIdAsync(id);
 
-                if (result.Succeeded)
+                if (user == null || user.UserName != username)
                 {
-                    response.IsSuccess = true;
-                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        response.ReturnUrl = model.ReturnUrl;
-                    }
-                                          
-                    return Ok(response);                                       
+                    return BadRequest();
                 }
+
+                user.Email = model.Email;
+
+                if (!String.IsNullOrEmpty(model.PhoneNumber))
+                {
+                    user.PhoneNumber = model.PhoneNumber;
+                }
+
+                response.Result = await _userManager.UpdateAsync(user);
+                response.Succeeded = response.Result.Succeeded;
+
+                return Ok(response);
             }
-            response.Error = "Invalid login attempt";
+            else
+            {
+                var errors = new List<string>();
+
+                foreach (var modelErrors in ModelState)
+                {
+                    string propertyName = modelErrors.Key;
+                    errors.Add($"Not valid {propertyName}.");
+                }
+                response.Errors = errors;
+
+                return BadRequest(response);
+            }
+        }
+
+        // DELETE api/<controller>/5/test
+        [HttpDelete("{id}/{username}")]
+        public async Task<IActionResult> DeleteAsync(string id, string username)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null || user.UserName != username)
+            {                
+                return BadRequest();
+            }
+            var response = new UserResponse();
+
+            response.Result = await _userManager.DeleteAsync(user);
+            response.Succeeded = response.Result.Succeeded;
+
             return Ok(response);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Logout()
-        {
-            await _signManager.SignOutAsync();
-            return Ok();
-        }
-
-        // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
