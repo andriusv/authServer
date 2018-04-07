@@ -15,6 +15,7 @@ using AuthorizationServer.Models;
 using IdentityServer4.Stores;
 using AuthorizationServer.Stores;
 using Swashbuckle.AspNetCore.Swagger;
+using AuthorizationServer.Handlers;
 
 namespace AuthorizationServer
 {
@@ -29,6 +30,9 @@ namespace AuthorizationServer
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+            services.AddAuthentication(o => o.AddScheme("api", a => a.HandlerType = typeof(TokenHandler)));
+
             ///*
             //  * Add to .csproj
             //  * 

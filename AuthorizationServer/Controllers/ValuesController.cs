@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthorizationServer.Controllers
 {
+
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = "api")]
     public class ValuesController : Controller
     {
         // GET api/values
