@@ -25,7 +25,7 @@ namespace AuthorizationServer.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody]RegisterUserRequest model)
+        public async Task<IActionResult> RegisterAsync([FromBody]RegisterUserRequest model)
         {
             var response = new UserResponse();
 

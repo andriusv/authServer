@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using AuthorizationServer.Models;
 using IdentityServer4.Stores;
 using AuthorizationServer.Stores;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace AuthorizationServer
 {
@@ -52,6 +53,12 @@ namespace AuthorizationServer
                 //.AddSigningCredential(new X509Certificate2(Path.Combine("..", "..", "certs", "IdentityServer4Auth.pfx")))
                 .AddInMemoryApiResources(ApiResourceProvider.GetAllResources())
                 .AddAspNetIdentity<ApplicationUser>();
+
+            // Register the Swagger generator, defining one or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,6 +80,15 @@ namespace AuthorizationServer
 
             // Note that UseIdentityServer must come after UseIdentity in the pipeline
             app.UseIdentityServer();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             app.UseMvc(routes =>
             {
