@@ -33,6 +33,10 @@ namespace AuthorizationServer.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Username };
+                if (!String.IsNullOrEmpty(model?.Email))
+                {
+                    user.Email = model.Email;
+                }
 
                 try
                 {
@@ -75,30 +79,30 @@ namespace AuthorizationServer.Controllers
 
         #region Login and Logout - not used at the moment
 
-        //[HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody]LoginRequest model)
-        //{
-        //    var response = new LoginResponse();
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody]LoginRequest model)
+        {
+            var response = new LoginResponse();
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        var result = await _signManager.PasswordSignInAsync(model.Username,
-        //           model.Password, model.RememberMe, false);
+            if (ModelState.IsValid)
+            {
+                var result = await _signManager.PasswordSignInAsync(model.Username,
+                   model.Password, model.RememberMe, false);
 
-        //        if (result.Succeeded)
-        //        {
-        //            response.IsSuccess = true;
-        //            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-        //            {
-        //                response.ReturnUrl = model.ReturnUrl;
-        //            }
+                if (result.Succeeded)
+                {
+                    response.IsSuccess = true;
+                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                    {
+                        response.ReturnUrl = model.ReturnUrl;
+                    }
 
-        //            return Ok(response);                                       
-        //        }
-        //    }
-        //    response.Error = "Invalid login attempt";
-        //    return Ok(response);
-        //}
+                    return Ok(response);
+                }
+            }
+            response.Error = "Invalid login attempt";
+            return Ok(response);
+        }
 
         //[HttpPost]
         //public async Task<IActionResult> Logout()
