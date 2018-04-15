@@ -289,3 +289,4 @@ __pycache__/
 
 examples.txt
 tempkey.rsa
+appsettings-custom.json

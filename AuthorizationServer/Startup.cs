@@ -16,14 +16,30 @@ using IdentityServer4.Stores;
 using AuthorizationServer.Stores;
 using Swashbuckle.AspNetCore.Swagger;
 using AuthorizationServer.Handlers;
+using AuthorizationServer.Data;
 
 namespace AuthorizationServer
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private IHostingEnvironment _hostingEnvironment;
+        private IConfigurationSection _appSettings;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = configuration;
+            //Configuration = configuration;
+            _hostingEnvironment = env;
+
+            var builder = new ConfigurationBuilder()
+             .SetBasePath(env.ContentRootPath)
+             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+             .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+             .AddJsonFile("appsettings-custom.json", optional: false)
+             .AddJsonFile($"appsettings-custom.{env.EnvironmentName}.json", optional: true)
+             .AddEnvironmentVariables();
+            Configuration = builder.Build();
+
+            _appSettings = Configuration.GetSection("AppSettings");
         }
 
         public IConfiguration Configuration { get; }
@@ -58,16 +74,21 @@ namespace AuthorizationServer
                 .AddInMemoryApiResources(ApiResourceProvider.GetAllResources())
                 .AddAspNetIdentity<ApplicationUser>();
 
+            // Add Database Initializer
+            services.AddScoped<IDbInitializer, DbInitializer>();
+
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "AuthServer", Version = "v1" });
             });
+
+            services.Configure<AppSettings>(_appSettings);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, 
-            RoleManager<IdentityRole> roleManager, UserDBContext context)
+            RoleManager<IdentityRole> roleManager, UserDBContext context, IDbInitializer dbInitializer)
         {
             context.Database.Migrate();
 
@@ -84,6 +105,9 @@ namespace AuthorizationServer
 
             // Note that UseIdentityServer must come after UseIdentity in the pipeline
             app.UseIdentityServer();
+
+            //Generate EF Core Seed Data
+            dbInitializer.Initialize();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
