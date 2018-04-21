@@ -15,13 +15,16 @@ namespace AuthorizationServer.Models
         {
             ClientId = "myClient",
             ClientName = "My Custom Client",
-            AccessTokenLifetime = 60 * 60 * 24,
+            AccessTokenLifetime = 60 * 15, // 15 min
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             RequireClientSecret = false,
             AllowedScopes =
             {
-                "myAPIs"
-            }
+                "myAPIs",
+                "offline_access"
+            },
+            AllowOfflineAccess = true,
+            AllowAccessTokensViaBrowser = true
         }
     };
 
