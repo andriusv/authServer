@@ -11,22 +11,23 @@ namespace AuthorizationServer.Models
     {
         public static IEnumerable<Client> AllClients { get; } = new[]
         {
-        new Client
-        {
-            ClientId = "myClient",
-            ClientName = "My Custom Client",
-            AccessTokenLifetime = 60 * 15, // 15 min
-            AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-            RequireClientSecret = false,
-            AllowedScopes =
+            new Client
             {
-                "myAPIs",
-                "offline_access"
-            },
-            AllowOfflineAccess = true,
-            AllowAccessTokensViaBrowser = true
-        }
-    };
+                ClientId = "myClient",
+                ClientName = "My Custom Client",
+                AccessTokenLifetime = 60 * 15, // 15 min
+                AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                RequireClientSecret = false,
+                AllowedScopes =
+                {
+                    "myAPIs",
+                    "offline_access"
+                }
+                //,
+                //AllowOfflineAccess = true,
+                //AllowAccessTokensViaBrowser = true
+            }
+        };
 
         public Task<Client> FindClientByIdAsync(string clientId)
         {
