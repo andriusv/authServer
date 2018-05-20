@@ -35,7 +35,7 @@ In appsettings-custom.json change data to desired:
 ```
 
 ## <a name="SeedData"></a>Seed Data
-In AuthService it is possible to add users via seed. Administrator is set in Data/DbInitializer.cs
+In AuthService it is possible to add users via seed. Administrator is set in Data/DbInitializer.cs from appsettings-custom.json file.
 
 ## Test Auth Service
 Go to <this project>/swagger
