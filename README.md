@@ -20,16 +20,16 @@ dotnet restore
 ```
 In appsettings.json change DefaultDbContext to desired one:
 ```
-    "DefaultDbContext": "Data Source=<Server>;Initial Catalog=<Database>;User Id=<userName>;Password=<Password>"
+"DefaultDbContext": "Data Source=<Server>;Initial Catalog=<Database>;User Id=<userName>;Password=<Password>"
 ```
 
-In appsettings-custom.json change data to desired (for example):
+In appsettings-custom.json change data to desired:
 ```
-    {
+{
   "AppSettings": {
-    "AdminName": "admin",
-    "AdminEmail": "admin@admin.admin",
-    "AdminPassword": "Admin2018!"
+    "AdminName": "<userName>",
+    "AdminEmail": "<email>",
+    "AdminPassword": "<password>"
   }
 }
 ```
