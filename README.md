@@ -23,6 +23,11 @@ In appsettings.json change DefaultDbContext to desired one:
 "DefaultDbContext": "Data Source=<Server>;Initial Catalog=<Database>;User Id=<userName>;Password=<Password>"
 ```
 
+Run migrations
+```
+dotnet ef database update --context UserDbContext
+```
+
 In appsettings-custom.json change data to desired:
 ```
 {
